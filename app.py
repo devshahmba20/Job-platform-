@@ -43,17 +43,21 @@ def clean(j):
     }
 
 @app.get("/api/jobs")
-async def jobs(q: str = "", page: int = 1):
+async def jobs(q: str = "", where: str = "Ahmedabad", page: int = 1):
     if not APP_ID or not APP_KEY:
         raise HTTPException(500, "Adzuna keys missing")
-    key = (q.lower().strip(), page)
+    where = where.strip() or "India"
+    key = (q.lower().strip(), where.lower(), page)
     hit = cache.get(key)
     if hit and time.time() - hit[0] < 600:
         return hit[1]
     params = {"app_id": APP_ID, "app_key": APP_KEY, "results_per_page": 30,
-              "where": "Ahmedabad", "distance": 25, "sort_by": "date"}
-    if q.strip():
-        params["what"] = q.strip()
+              "where": where, "distance": 40, "sort_by": "date"}
+    words = q.split()
+    if len(words) == 1:
+        params["what"] = words[0]
+    elif words:
+        params["what_or"] = " ".join(words)
     try:
         async with httpx.AsyncClient(timeout=15) as c:
             r = await c.get(f"https://api.adzuna.com/v1/api/jobs/in/search/{page}", params=params)
@@ -68,3 +72,4 @@ async def jobs(q: str = "", page: int = 1):
 @app.get("/")
 async def home():
     return FileResponse("static/index.html")
+    
