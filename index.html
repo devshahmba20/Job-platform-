@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ahmedabad Job Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef3f1;--card:#fff;--ink:#14231f;--mute:#5d706a;--line:#d5e0dc;--brand:#0f4c4a;--on-brand:#fff;--accent:#f2a33a;--chip:#dfeae6;--ok:#1d7a4d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1816;--card:#16251f;--ink:#e6f0ec;--mute:#93a8a1;--line:#274039;--brand:#4fb3a9;--on-brand:#0e1816;--chip:#1e332c;--ok:#5fcf93}}
+:root[data-theme="dark"]{--bg:#0e1816;--card:#16251f;--ink:#e6f0ec;--mute:#93a8a1;--line:#274039;--brand:#4fb3a9;--on-brand:#0e1816;--chip:#1e332c;--ok:#5fcf93}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Figtree,system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+h1{font:700 26px/1.15 "Bricolage Grotesque",Figtree,sans-serif;margin:4px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:0 0 14px;font-size:14px}
+.note{background:var(--chip);border-left:4px solid var(--accent);padding:8px 10px;border-radius:6px;font-size:13px;margin-bottom:14px}
+.search{display:flex;gap:8px}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-width:0}
+input{flex:1}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.loc{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:13px;margin:8px 2px 12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:500 13px Figtree,sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--card);border-radius:12px;margin-bottom:14px}
+.stat{padding:10px 12px}.stat+.stat{border-left:1px solid var(--line)}
+.stat b{display:block;font:700 20px "Bricolage Grotesque",Figtree,sans-serif}
+.stat span{color:var(--mute);font-size:12px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--mute);font-size:13px}
+.job{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.head{width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:14px;cursor:pointer;display:block}
+.top{display:flex;justify-content:space-between;gap:10px}
+.t{font:700 17px/1.25 "Bricolage Grotesque",Figtree,sans-serif}
+.co{color:var(--mute);font-size:14px;margin-top:2px}
+.sal{font-weight:600;color:var(--ok);white-space:nowrap;font-size:14px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{background:var(--chip);border-radius:6px;padding:2px 8px;font-size:12px}
+.new{background:var(--accent);color:#14231f;font-weight:600}
+.detail{display:none;padding:0 14px 14px;border-top:1px solid var(--line)}
+.job.open .detail{display:block}
+.detail h3{font:600 13px Figtree,sans-serif;margin:14px 0 4px;color:var(--mute)}
+.detail p,.detail ul{margin:0;font-size:14px}.detail ul{padding-left:18px}
+.acts{display:flex;gap:8px;margin-top:14px}
+button.btn{font:600 14px Figtree,sans-serif;border-radius:10px;padding:10px 14px;cursor:pointer;border:1px solid var(--brand);background:var(--brand);color:var(--on-brand);flex:1}
+button.btn.alt{background:transparent;color:var(--brand)}
+.empty{text-align:center;padding:36px 12px;color:var(--mute)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:13px;max-width:90%;display:none;z-index:5}
+@media (min-width:600px){.filters{grid-template-columns:repeat(4,1fr)}}
+.filters{grid-template-columns:repeat(3,1fr)}@media (min-width:600px){.filters{grid-template-columns:repeat(3,1fr)}}.desc{white-space:pre-line;word-break:break-word}a.btn{text-align:center;text-decoration:none;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Ahmedabad jobs</h1>
+<p class="sub">Live vacancies, Adzuna thi. Koi pan field search karo.</p>
+<div class="search"><input id="q" type="search" placeholder="Search: derivatives, accountant, developer…" aria-label="Search jobs"></div>
+<div class="loc">📍 Ahmedabad, Gujarat, India</div>
+<div class="chips" id="chips"></div>
+<div class="filters">
+<select id="sal" aria-label="Minimum salary"><option value="0">Salary: any</option><option value="4">4 LPA+</option><option value="8">8 LPA+</option><option value="15">15 LPA+</option></select>
+<select id="type" aria-label="Job type"><option value="">Type: any</option><option>Full-time</option><option>Part-time</option><option>Contract</option></select>
+<select id="date" aria-label="Date posted"><option value="999">Posted: any</option><option value="1">24 hours</option><option value="7">7 days</option><option value="30">30 days</option></select>
+</div>
+<div class="stats">
+<div class="stat"><b id="sCount">0</b><span>shown</span></div>
+<div class="stat"><b id="sCo">0</b><span>companies</span></div>
+<div class="stat"><b id="sAvg">–</b><span>avg LPA</span></div>
+</div>
+<div class="bar"><span id="found"></span>
+<select id="sort" aria-label="Sort" style="padding:6px 8px;font-size:13px"><option value="new">Newest first</option><option value="sal">Highest salary</option></select></div>
+<div id="list"></div>
+</div>
+<script>
+var J=[],total=0,st={f:"",open:null,saved:{}},tm;
+try{var sv=localStorage.getItem("savedJobs");if(sv)st.saved=JSON.parse(sv)||{}}catch(x){}
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function chips(){var fs=["All"].concat(J.map(function(j){return j.f}).filter(function(v,i,a){return v&&a.indexOf(v)===i}));
+$("chips").innerHTML=fs.map(function(f){var on=(f==="All"&&!st.f)||st.f===f;return '<button class="chip" aria-pressed="'+on+'" data-f="'+esc(f)+'">'+esc(f)+'</button>'}).join("")}
+function fmt(j){return j.s?"₹"+j.s[0]+(j.s[1]!==j.s[0]?"–"+j.s[1]:"")+" LPA"+(j.pred?" (est.)":""):"Salary not listed"}
+function ago(d){return d>=999?"":d<=1?"Today":d+" days ago"}
+function render(){
+var sl=+$("sal").value,ty=$("type").value,dt=+$("date").value;
+var r=J.map(function(j,i){return Object.assign({i:i},j)}).filter(function(j){
+if(st.f&&j.f!==st.f)return false;
+if(sl&&(!j.s||j.s[1]<sl))return false;
+if(ty&&j.ty!==ty)return false;
+return j.d<=dt});
+r.sort($("sort").value==="sal"?function(a,b){return(b.s?b.s[1]:0)-(a.s?a.s[1]:0)}:function(a,b){return a.d-b.d});
+var sj=r.filter(function(j){return j.s});
+$("sCount").textContent=r.length;
+$("sCo").textContent=r.map(function(j){return j.c}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
+$("sAvg").textContent=sj.length?(sj.reduce(function(a,j){return a+(j.s[0]+j.s[1])/2},0)/sj.length).toFixed(1):"–";
+$("found").textContent=r.length+" shown, "+total+" total in Ahmedabad";
+if(!r.length){$("list").innerHTML='<div class="empty">Koi job maline nathi. Filters ocha karo ya bijo keyword try karo.</div>';return}
+$("list").innerHTML=r.map(function(j){
+var open=st.open===j.i;
+return '<div class="job'+(open?' open':'')+'"><button class="head" data-i="'+j.i+'" aria-expanded="'+open+'"><div class="top"><div><div class="t">'+esc(j.t)+'</div><div class="co">'+esc(j.c)+(j.a?' · '+esc(j.a):'')+'</div></div><div class="sal">'+esc(fmt(j))+'</div></div>'+
+'<div class="meta">'+(j.d<=2?'<span class="tag new">New</span>':'')+(j.ty?'<span class="tag">'+esc(j.ty)+'</span>':'')+(j.f?'<span class="tag">'+esc(j.f)+'</span>':'')+(ago(j.d)?'<span class="tag">'+ago(j.d)+'</span>':'')+'</div></button>'+
+'<div class="detail"><h3>About the role</h3><p class="desc">'+esc(j.ds)+'</p><div class="acts"><button class="btn" data-apply="'+j.i+'">Apply on Adzuna</button><button class="btn alt" data-save="'+esc(j.id)+'">'+(st.saved[j.id]?'Saved ✓':'Save')+'</button></div></div></div>'}).join("")}
+function load(){
+$("found").textContent="Loading…";
+fetch("/api/jobs?q="+encodeURIComponent($("q").value.trim())).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
+J=d.jobs;total=d.count;st.f="";st.open=null;chips();render()}).catch(function(){
+J=[];total=0;chips();$("list").innerHTML='<div class="empty">Jobs load na thai. Thodi vaar pachi try karo.</div>';$("found").textContent=""})}
+document.addEventListener("click",function(e){
+var b=e.target.closest("button");if(!b)return;
+if(b.dataset.f!==undefined){st.f=b.dataset.f==="All"?"":b.dataset.f;chips();render()}
+else if(b.dataset.i!==undefined){var i=+b.dataset.i;st.open=st.open===i?null:i;render()}
+else if(b.dataset.apply!==undefined){var u=J[+b.dataset.apply].url;if(u)window.open(u,"_blank","noopener")}
+else if(b.dataset.save!==undefined){var k=b.dataset.save;if(st.saved[k])delete st.saved[k];else st.saved[k]=1;try{localStorage.setItem("savedJobs",JSON.stringify(st.saved))}catch(x){}render()}});
+$("q").addEventListener("input",function(){clearTimeout(tm);tm=setTimeout(load,500)});
+["sal","type","date","sort"].forEach(function(i){$(i).addEventListener("input",render)});
+load();
+</script>
+</body>
+</html>
