@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ahmedabad Job Dashboard</title>
+<title>Job Dashboard</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap">
 <style>
 :root{--bg:#eef3f1;--card:#fff;--ink:#14231f;--mute:#5d706a;--line:#d5e0dc;--brand:#0f4c4a;--on-brand:#fff;--accent:#f2a33a;--chip:#dfeae6;--ok:#1d7a4d;
@@ -55,10 +55,10 @@ button.btn.alt{background:transparent;color:var(--brand)}
 </head>
 <body>
 <div class="wrap">
-<h1>Ahmedabad jobs</h1>
+<h1>Job dashboard</h1>
 <p class="sub">Live vacancies, Adzuna thi. Koi pan field search karo.</p>
 <div class="search"><input id="q" type="search" placeholder="Search: derivatives, accountant, developer…" aria-label="Search jobs"></div>
-<div class="loc">📍 Ahmedabad, Gujarat, India</div>
+<div class="loc">📍 <input id="loc" value="Ahmedabad" placeholder="City, e.g. Surat, Mumbai, India" aria-label="Location" style="padding:6px 10px;font-size:13px"></div>
 <div class="chips" id="chips"></div>
 <div class="filters">
 <select id="sal" aria-label="Minimum salary"><option value="0">Salary: any</option><option value="4">4 LPA+</option><option value="8">8 LPA+</option><option value="15">15 LPA+</option></select>
@@ -95,8 +95,8 @@ var sj=r.filter(function(j){return j.s});
 $("sCount").textContent=r.length;
 $("sCo").textContent=r.map(function(j){return j.c}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
 $("sAvg").textContent=sj.length?(sj.reduce(function(a,j){return a+(j.s[0]+j.s[1])/2},0)/sj.length).toFixed(1):"–";
-$("found").textContent=r.length+" shown, "+total+" total in Ahmedabad";
-if(!r.length){$("list").innerHTML='<div class="empty">Koi job maline nathi. Filters ocha karo ya bijo keyword try karo.</div>';return}
+$("found").textContent=r.length+" shown, "+total+" total";
+if(!r.length){$("list").innerHTML='<div class="empty">Koi job maline nathi. Location badlo (jem ke Gujarat ya India), ek j shabd lakho, ya filters ocha karo.</div>';return}
 $("list").innerHTML=r.map(function(j){
 var open=st.open===j.i;
 return '<div class="job'+(open?' open':'')+'"><button class="head" data-i="'+j.i+'" aria-expanded="'+open+'"><div class="top"><div><div class="t">'+esc(j.t)+'</div><div class="co">'+esc(j.c)+(j.a?' · '+esc(j.a):'')+'</div></div><div class="sal">'+esc(fmt(j))+'</div></div>'+
@@ -104,7 +104,7 @@ return '<div class="job'+(open?' open':'')+'"><button class="head" data-i="'+j.i
 '<div class="detail"><h3>About the role</h3><p class="desc">'+esc(j.ds)+'</p><div class="acts"><button class="btn" data-apply="'+j.i+'">Apply on Adzuna</button><button class="btn alt" data-save="'+esc(j.id)+'">'+(st.saved[j.id]?'Saved ✓':'Save')+'</button></div></div></div>'}).join("")}
 function load(){
 $("found").textContent="Loading…";
-fetch("/api/jobs?q="+encodeURIComponent($("q").value.trim())).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
+fetch("/api/jobs?q="+encodeURIComponent($("q").value.trim())+"&where="+encodeURIComponent($("loc").value.trim())).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
 J=d.jobs;total=d.count;st.f="";st.open=null;chips();render()}).catch(function(){
 J=[];total=0;chips();$("list").innerHTML='<div class="empty">Jobs load na thai. Thodi vaar pachi try karo.</div>';$("found").textContent=""})}
 document.addEventListener("click",function(e){
@@ -113,7 +113,7 @@ if(b.dataset.f!==undefined){st.f=b.dataset.f==="All"?"":b.dataset.f;chips();rend
 else if(b.dataset.i!==undefined){var i=+b.dataset.i;st.open=st.open===i?null:i;render()}
 else if(b.dataset.apply!==undefined){var u=J[+b.dataset.apply].url;if(u)window.open(u,"_blank","noopener")}
 else if(b.dataset.save!==undefined){var k=b.dataset.save;if(st.saved[k])delete st.saved[k];else st.saved[k]=1;try{localStorage.setItem("savedJobs",JSON.stringify(st.saved))}catch(x){}render()}});
-$("q").addEventListener("input",function(){clearTimeout(tm);tm=setTimeout(load,500)});
+["q","loc"].forEach(function(i){$(i).addEventListener("input",function(){clearTimeout(tm);tm=setTimeout(load,600)})});
 ["sal","type","date","sort"].forEach(function(i){$(i).addEventListener("input",render)});
 load();
 </script>
